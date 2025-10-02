@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaUser, FaEnvelope, FaComment, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(""); // "", "success", "error"
+  const [status, setStatus] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,36 +42,60 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="min-h-screen px-6 md:px-20 py-16 bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
+      className="relative min-h-screen px-6 md:px-20 py-16 bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
     >
-      <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-8">
+      <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
         Contact Me
       </h2>
       <p className="text-center text-gray-700 dark:text-gray-300 mb-12 max-w-2xl mx-auto">
         Have a question or want to work together? Fill out the form and I will get back to you as soon as possible.
       </p>
 
-      <motion.form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg space-y-6 relative"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        {/* Floating label inputs */}
-        {["name", "email", "message"].map((field) => (
-          <div key={field} className="relative">
-            {field !== "message" ? (
+      {/* Split layout */}
+      <div className="flex flex-col md:flex-row gap-12 max-w-6xl mx-auto">
+        {/* Left - Form */}
+        <motion.form
+          onSubmit={handleSubmit}
+          className="flex-1 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl space-y-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="space-y-4">
+            <div className="relative">
+              <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" />
               <input
-                type={field === "email" ? "email" : "text"}
-                name={field}
-                value={formData[field]}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 required
                 placeholder=" "
-                className="peer w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition"
+                className="peer w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition"
               />
-            ) : (
+              <label className="absolute left-10 top-3 text-gray-400 dark:text-gray-300 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-3 peer-focus:text-sm peer-focus:text-indigo-600 dark:peer-focus:text-indigo-400">
+                Your Name
+              </label>
+            </div>
+
+            <div className="relative">
+              <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300" />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder=" "
+                className="peer w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition"
+              />
+              <label className="absolute left-10 top-3 text-gray-400 dark:text-gray-300 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-3 peer-focus:text-sm peer-focus:text-indigo-600 dark:peer-focus:text-indigo-400">
+                Your Email
+              </label>
+            </div>
+
+            <div className="relative">
+              <FaComment className="absolute left-3 top-3 text-gray-400 dark:text-gray-300" />
               <textarea
                 name="message"
                 value={formData.message}
@@ -78,49 +103,74 @@ export default function Contact() {
                 required
                 rows={5}
                 placeholder=" "
-                className="peer w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition"
+                className="peer w-full pl-10 p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition"
               />
-            )}
-            <label className="absolute left-4 top-3 text-gray-400 dark:text-gray-300 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-3 peer-focus:text-sm peer-focus:text-indigo-600 dark:peer-focus:text-indigo-400">
-              {field === "name" ? "Your Name" : field === "email" ? "Your Email" : "Your Message"}
-            </label>
+              <label className="absolute left-10 top-3 text-gray-400 dark:text-gray-300 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base peer-focus:top-3 peer-focus:text-sm peer-focus:text-indigo-600 dark:peer-focus:text-indigo-400">
+                Your Message
+              </label>
+            </div>
           </div>
-        ))}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 text-white p-4 rounded-lg font-semibold hover:bg-indigo-500 transition transform hover:scale-105"
-        >
-          {loading ? "Sending..." : "Send Message"}
-        </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white p-4 rounded-lg font-semibold hover:bg-indigo-500 transition transform hover:scale-105"
+          >
+            {loading ? "Sending..." : "Send Message"}
+          </button>
 
-        {/* Animated success/error message */}
-        <AnimatePresence>
-          {status === "success" && (
-            <motion.p
-              key="success"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-green-600 mt-2 text-center font-medium"
+          <AnimatePresence>
+            {status === "success" && (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-4 text-green-600 text-center font-medium"
+              >
+                Message sent successfully!
+                
+              </motion.div>
+            )}
+            {status === "error" && (
+              <motion.p
+                key="error"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-4 text-red-600 text-center font-medium"
+              >
+                Something went wrong. Please try again!
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </motion.form>
+
+        {/* Right - Info / Illustration */}
+        <div className="flex-1 flex flex-col justify-center gap-6 p-6 rounded-2xl bg-indigo-50 dark:bg-gray-800 shadow-xl">
+          <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+            Get in Touch
+          </h3>
+          <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+            <FaEnvelope /> <span>abdullah.almaruf1121@gmail.com</span>
+          </div>
+          <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+            <FaPhoneAlt /> <span>+8801571350711</span>
+          </div>
+          <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+            <FaMapMarkerAlt /> <span>Dhaka, Bangladesh</span>
+          </div>
+          <div className="mt-6">
+            <a
+              href="/Maruf_CV.pdf"
+              target="_blank"
+              className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-500 transition"
             >
-              Message sent successfully!
-            </motion.p>
-          )}
-          {status === "error" && (
-            <motion.p
-              key="error"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-red-600 mt-2 text-center font-medium"
-            >
-              Something went wrong. Please try again!
-            </motion.p>
-          )}
-        </AnimatePresence>
-      </motion.form>
+              Download My CV
+            </a>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

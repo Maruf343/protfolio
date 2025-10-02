@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import DarkModeToggle from "./DarkModeToggle";
 
-const sections = ["home","projects", "about-me", "skills", "tech-news", "contact"];
+const sections = ["home","projects", "about-me", "skills", "tech-news", "contact", "footer"];
 
 export default function Navbar() {
   const [active, setActive] = useState("home");

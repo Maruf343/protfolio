@@ -8,7 +8,7 @@ export default function AboutMe() {
   return (
     <section
       id="about-me"
-      className="min-h-screen px-6 md:px-20 py-20 bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-black"
+      className="min-h-screen px-6 md:px-20 py-20 bg-gradient-to-br from-indigo-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
     >
       {/* Title */}
       <motion.h2
@@ -16,9 +16,9 @@ export default function AboutMe() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="text-5xl font-extrabold text-center mb-24 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-wide"
+        className="text-5xl font-extrabold text-center mb-14 "
       >
-        👋 About Me
+       About Me
       </motion.h2>
 
       <div className="flex flex-col md:flex-row items-center gap-16 max-w-6xl mx-auto">

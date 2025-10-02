@@ -7,6 +7,7 @@ import Skills from "@/components/Skills";
 import TechNews from "@/components/TechNews";
 import Contact from "@/components/Contact";
 import AboutMe from "@/components/AboutMe";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
         <TechNews />
         <Contact />
       </div>
+      <Footer />
     </main>
   );
 }
