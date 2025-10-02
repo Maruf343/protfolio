@@ -1,6 +1,7 @@
 "use client";
+
 import Image from "next/image";
-import marufPhoto from "../public/maruf.png"; // your image in public folder
+import marufPhoto from "../public/maruf.png"; // আপনার ছবি public ফোল্ডারে আছে
 import { useState, useEffect } from "react";
 
 export default function Hero() {
@@ -22,9 +23,11 @@ export default function Hero() {
   // Resume download
   const downloadResume = () => {
     const link = document.createElement("a");
-    link.href = "../public/Mohammad_abdullah_al_maruf (1).pdf"; // make sure your resume is in the public folder
+    link.href = "/Mohammad_abdullah_al_maruf.pdf"; // ✅ শুধু public ফোল্ডারের path
     link.download = "Mohammad_Abdullah_Al_Maruf_Resume.pdf";
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   return (
