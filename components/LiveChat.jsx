@@ -1,5 +1,3 @@
-
-
 "use client";
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase.js";
@@ -12,10 +10,17 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  arrayUnion
+  getDoc,
 } from "firebase/firestore";
-import { FaFacebookMessenger, FaUserEdit, FaPaperPlane, FaSmile, FaHeart, FaThumbsUp, FaSadTear, FaCircle } from "react-icons/fa";
-import EmojiPicker from "./EmojiPicker";
+import {
+  FaFacebookMessenger,
+  FaUserEdit,
+  FaPaperPlane,
+  FaSmile,
+  FaHeart,
+  FaThumbsUp,
+  FaCircle,
+} from "react-icons/fa";
 
 const ADMIN_NAME = "Maruf";
 
@@ -28,8 +33,30 @@ export default function LiveChat() {
   const [showEmoji, setShowEmoji] = useState(false);
   const [chatWidth, setChatWidth] = useState(384);
   const [online, setOnline] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("chatTheme") || "system";
+    }
+    return "system";
+  });
+  const [guests, setGuests] = useState([]); // Multi-user
+  const [activeGuest, setActiveGuest] = useState(null);
+  const isAdmin = guestName === ADMIN_NAME;
 
-  // Online/offline status
+  // Theme class
+  const getThemeClass = () => {
+    if (theme === "dark") return "chat-theme-dark";
+    if (theme === "light") return "chat-theme-light";
+    return "";
+  };
+
+  const handleThemeChange = (e) => {
+    setTheme(e.target.value);
+    localStorage.setItem("chatTheme", e.target.value);
+  };
+
+  // Online status
   useEffect(() => {
     setOnline(true);
     const handleOffline = () => setOnline(false);
@@ -41,7 +68,7 @@ export default function LiveChat() {
     };
   }, []);
 
-  // Set guest name on first load
+  // Guest name
   useEffect(() => {
     const storedName = localStorage.getItem("guestName");
     if (storedName) {
@@ -53,24 +80,41 @@ export default function LiveChat() {
     }
   }, []);
 
-  // Real-time Firestore messages
+  // Firestore messages
   useEffect(() => {
     if (!open) return;
     const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const allMsgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(allMsgs);
+
+      const guestSet = new Set();
+      allMsgs.forEach((msg) => {
+        if (msg.user !== ADMIN_NAME) guestSet.add(msg.user);
+      });
+      setGuests(Array.from(guestSet));
+
+      if (isAdmin && !activeGuest && guestSet.size > 0) {
+        setActiveGuest(Array.from(guestSet)[0]);
+      }
     });
     return () => unsubscribe();
-  }, [open]);
+  }, [open, activeGuest]);
 
-  // Notification on new message
+  // Notifications
   useEffect(() => {
     if (!open || messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
     if (lastMsg.user !== guestName) {
       if (window.Notification && Notification.permission === "granted") {
         new Notification(`${lastMsg.user}: ${lastMsg.text}`);
-      } else if (window.Notification && Notification.permission !== "denied") {
+      } else if (
+        window.Notification &&
+        Notification.permission !== "denied"
+      ) {
         Notification.requestPermission();
       }
     }
@@ -83,13 +127,14 @@ export default function LiveChat() {
     await addDoc(collection(db, "messages"), {
       text: newMessage,
       user: guestName,
+      to: activeGuest || ADMIN_NAME,
       timestamp: serverTimestamp(),
       reactions: [],
     });
     setNewMessage("");
   };
 
-  // Edit guest name
+  // Edit name
   const handleNameEdit = (e) => {
     e.preventDefault();
     if (!guestName.trim()) return;
@@ -97,15 +142,14 @@ export default function LiveChat() {
     setEditingName(false);
   };
 
-  // Messenger-style: only one reaction per user per message
+  // Add reaction
   const addReaction = async (msgId, emoji) => {
     const msgDoc = doc(db, "messages", msgId);
-    // Remove previous reaction by this user, then add new one
-    const msgSnap = await msgDoc.get();
+    const msgSnap = await getDoc(msgDoc);
     let reactions = [];
     if (msgSnap.exists()) {
       reactions = msgSnap.data().reactions || [];
-      reactions = reactions.filter(r => r.user !== guestName);
+      reactions = reactions.filter((r) => r.user !== guestName);
     }
     reactions.push({ user: guestName, type: emoji });
     await updateDoc(msgDoc, { reactions });
@@ -113,165 +157,269 @@ export default function LiveChat() {
 
   return (
     <>
-      {/* Floating Messenger Icon */}
+      {/* Floating Icon */}
       <button
-        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-4 flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-4"
         onClick={() => setOpen((o) => !o)}
-        aria-label="Open Messenger Chat"
       >
         <FaFacebookMessenger size={32} />
       </button>
 
-      {/* Messenger Chat Window */}
+      {/* Chat Window */}
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-50 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden animate-fade-in"
-          style={{ width: chatWidth, maxWidth: "100%" }}
+          className={`fixed bottom-24 right-6 z-50 rounded-3xl shadow-2xl border flex overflow-hidden animate-fade-in chat-responsive ${getThemeClass()}`}
+          style={{
+            width: isAdmin ? chatWidth + 120 : chatWidth,
+            maxWidth: "100%",
+          }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 font-semibold">
-            <span>Messenger Chat</span>
-            <span className="flex items-center gap-2 text-xs">
-              <FaCircle className={online ? "text-green-400" : "text-gray-400"} />
-              {online ? "Online" : "Offline"}
-            </span>
-            <button
-              className="text-white hover:text-gray-200"
-              onClick={() => setOpen(false)}
-              aria-label="Close Chat"
-            >
-              ✕
-            </button>
+          {/* Sidebar for Admin */}
+{isAdmin && (
+  <div className="w-72 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-r border-gray-200 dark:border-gray-700 flex flex-col py-4">
+    <h2 className="px-4 pb-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+      Chats
+    </h2>
+    <div className="flex-1 overflow-y-auto">
+      {guests.map((g) => (
+        <button
+          key={g}
+          onClick={() => setActiveGuest(g)}
+          className={`w-full flex items-center px-4 py-3 text-left hover:bg-blue-50 dark:hover:bg-gray-800 transition ${
+            activeGuest === g ? "bg-blue-100 dark:bg-gray-800" : ""
+          }`}
+        >
+          {/* Avatar */}
+          <div className="relative w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-400 to-blue-500 text-white flex items-center justify-center font-bold mr-3">
+            {g.charAt(0).toUpperCase()}
+            {/* Online dot */}
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></span>
           </div>
 
-          {/* Name Edit */}
-          <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <span className="font-bold text-indigo-600">You:</span>
-            {editingName ? (
-              <form onSubmit={handleNameEdit} className="flex gap-2">
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={e => setGuestName(e.target.value)}
-                  className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 focus:outline-none"
-                  autoFocus
-                />
-                <button type="submit" className="text-blue-600 font-bold">Save</button>
-              </form>
-            ) : (
-              <span className="text-gray-800 dark:text-gray-200">{guestName}</span>
-            )}
-            <button
-              className="ml-2 text-indigo-600 hover:text-indigo-800"
-              onClick={() => setEditingName(true)}
-              aria-label="Edit Name"
+          {/* Name + Preview */}
+          <div className="flex-1 min-w-0">
+            <p
+              className={`truncate font-medium ${
+                activeGuest === g
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-gray-800 dark:text-gray-200"
+              }`}
             >
-              <FaUserEdit />
-            </button>
+              {g}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              {activeGuest === g ? "Active now" : "Tap to chat"}
+            </p>
           </div>
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
-          {/* Messages */}
-          <div className="flex-1 p-4 space-y-3 overflow-y-auto max-h-96 bg-gray-50 dark:bg-gray-800">
-            {messages.length === 0 && (
-              <p className="text-center text-gray-500">No messages yet...</p>
+
+          {/* Main Chat */}
+          <div className="flex-1 flex flex-col">
+            {/* Header */}
+            <div className="sticky top-0 flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 font-semibold shadow-md z-10">
+              <span className="flex items-center gap-2">
+                <FaFacebookMessenger /> Messenger
+              </span>
+              <span className="flex items-center gap-1 text-xs">
+                <FaCircle className={online ? "text-green-400" : "text-gray-400"} />
+                {online ? "Online" : "Offline"}
+              </span>
+              <div className="flex gap-2">
+                <button onClick={() => setShowSettings((s) => !s)}>⚙️</button>
+                <button onClick={() => setOpen(false)}>✕</button>
+              </div>
+            </div>
+
+            {/* Settings */}
+            {showSettings && (
+              <div className="px-4 py-2 border-b">
+                <span className="mr-2">Theme:</span>
+                <select
+                  value={theme}
+                  onChange={handleThemeChange}
+                  className="rounded px-2 py-1"
+                >
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
             )}
-            {messages.map((msg) => {
-              // Only one reaction per user per message
-              const userReaction = msg.reactions?.find(r => r.user === guestName)?.type;
-              // Group reactions by type and count
-              const reactionCounts = {};
-              if (msg.reactions) {
-                msg.reactions.forEach(r => {
+
+            {/* Name Edit */}
+            <div className="flex items-center gap-3 px-4 py-2 border-b">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center text-white font-bold">
+                {guestName.charAt(0).toUpperCase()}
+              </div>
+              {editingName ? (
+                <form onSubmit={handleNameEdit} className="flex gap-2">
+                  <input
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    className="px-2 py-1 rounded border"
+                    autoFocus
+                  />
+                  <button type="submit" className="text-blue-600 font-bold">
+                    Save
+                  </button>
+                </form>
+              ) : (
+                <>
+                  <span className="font-bold">{guestName}</span>
+                  <button onClick={() => setEditingName(true)}>
+                    <FaUserEdit />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3">
+              {(isAdmin
+                ? messages.filter(
+                    (msg) =>
+                      (msg.user === ADMIN_NAME && msg.to === activeGuest) ||
+                      (msg.user === activeGuest && msg.to === ADMIN_NAME)
+                  )
+                : messages.filter(
+                    (msg) =>
+                      (msg.user === ADMIN_NAME && msg.to === guestName) ||
+                      (msg.user === guestName && msg.to === ADMIN_NAME)
+                  )
+              ).map((msg) => {
+                const userReaction = msg.reactions?.find(
+                  (r) => r.user === guestName
+                )?.type;
+                const reactionCounts = {};
+                msg.reactions?.forEach((r) => {
                   if (!reactionCounts[r.type]) reactionCounts[r.type] = [];
                   reactionCounts[r.type].push(r.user);
                 });
-              }
-              // Restore original bubble style and button appearance
-              const bubbleClass = `px-3 py-2 rounded-lg shadow max-w-xs relative ${msg.user === guestName ? "bg-blue-600 text-white" : msg.user === ADMIN_NAME ? "bg-green-100 text-green-900" : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"}`;
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.user === guestName ? "justify-end" : "justify-start"}`}
-                >
-                  <div className={bubbleClass}>
-                    <span className="block text-xs font-semibold mb-1">{msg.user === guestName ? "You" : msg.user}</span>
-                    {/* Link detection: render URLs as clickable links */}
-                    <span>
-                      {msg.text.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
-                        part.match(/https?:\/\/[^\s]+/) ? (
-                          <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="underline text-blue-500 hover:text-blue-700">{part}</a>
-                        ) : part
+
+                const isMe = msg.user === guestName;
+                return (
+                  <div
+                    key={msg.id}
+                    className={`flex items-end gap-2 ${
+                      isMe ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    {!isMe && (
+                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center font-bold text-white">
+                        {msg.user.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-xs px-4 py-2 rounded-3xl shadow text-sm ${
+                        isMe
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-none"
+                          : msg.user === ADMIN_NAME
+                          ? "bg-gradient-to-r from-green-400 to-green-500 text-white rounded-bl-none"
+                          : "bg-gray-200 text-gray-900 rounded-bl-none"
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                      <span className="text-[10px] opacity-70 mt-1 block text-right">
+                        {msg.timestamp
+                          ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "Sending..."}
+                      </span>
+                      {/* Reactions under bubble */}
+                      {msg.reactions?.length > 0 && (
+                        <div className="flex gap-1 mt-1">
+                          {Object.entries(reactionCounts).map(([type, users]) => (
+                            <span
+                              key={type}
+                              className="text-xs flex items-center gap-1 bg-white/70 rounded-full px-2 py-0.5 shadow"
+                            >
+                              {type === "love" && "❤️"}
+                              {type === "like" && "👍"}
+                              <span>{users.length}</span>
+                            </span>
+                          ))}
+                        </div>
                       )}
-                    </span>
-                    {/* Messenger-style reactions: only one per user */}
-                    <div className="absolute -bottom-6 left-0 flex gap-1">
-                      <button title="Love" onClick={() => addReaction(msg.id, "love")}><FaHeart className={`text-red-500 ${userReaction === "love" ? "" : "opacity-50"}`} /></button>
-                      <button title="Like" onClick={() => addReaction(msg.id, "like")}><FaThumbsUp className={`text-blue-500 ${userReaction === "like" ? "" : "opacity-50"}`} /></button>
-                      {/* Show all reactions with counts */}
-                      {Object.entries(reactionCounts).filter(([type]) => type === "love" || type === "like").map(([type, users]) => (
-                        <span key={type} className="ml-2 text-lg flex items-center gap-1">
-                          {type === "love" && <FaHeart className="text-red-500" />}
-                          {type === "like" && <FaThumbsUp className="text-blue-500" />}
-                          <span className="text-xs">{users.length}</span>
-                        </span>
-                      ))}
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
 
-          {/* Message Input */}
-          <form onSubmit={sendMessage} className="p-3 flex gap-2 border-t border-gray-200 dark:border-gray-700 relative">
-            <button
-              type="button"
-              className="text-xl px-2 text-yellow-500 hover:text-yellow-600"
-              onClick={() => setShowEmoji((v) => !v)}
-              aria-label="Pick Emoji"
+            {/* Input */}
+            <form
+              onSubmit={sendMessage}
+              className="flex items-center gap-2 px-4 py-3 border-t bg-white dark:bg-gray-900"
             >
-              <FaSmile />
-            </button>
-            {/* Reduced emoji picker: only show a small set inline */}
-            {showEmoji && (
-              <div className="absolute bottom-12 left-0 bg-white dark:bg-gray-800 rounded shadow p-2 z-50 flex gap-2">
-                {["😀","😂","😍","👍","🙏","🔥","🎉","😎","🥳","😢"].map(e => (
-                  <button key={e} className="text-2xl" onClick={() => { setNewMessage(newMessage + e); setShowEmoji(false); }}>{e}</button>
-                ))}
-              </div>
-            )}
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={e => setNewMessage(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
-              aria-label="Send"
-            >
-              <FaPaperPlane />
-            </button>
-          </form>
-          {/* Chat size controls */}
-          <div className="flex justify-end gap-2 px-3 pb-2 text-xs text-gray-500">
-            <span>Size:</span>
-            <button onClick={() => setChatWidth(320)} className="px-2">S</button>
-            <button onClick={() => setChatWidth(384)} className="px-2">M</button>
-            <button onClick={() => setChatWidth(480)} className="px-2">L</button>
+              <button
+                type="button"
+                className="text-2xl text-gray-500 hover:text-yellow-500"
+                onClick={() => setShowEmoji((v) => !v)}
+              >
+                <FaSmile />
+              </button>
+              {showEmoji && (
+                <div className="absolute bottom-20 left-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2 z-50 flex gap-2">
+                  {["😀","😂","😍","👍","🙏","🔥","🎉","😎","🥳","😢"].map((e) => (
+                    <button
+                      key={e}
+                      className="text-2xl hover:scale-110 transition"
+                      onClick={() => {
+                        setNewMessage(newMessage + e);
+                        setShowEmoji(false);
+                      }}
+                    >
+                      {e}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="flex-1 px-4 py-2 rounded-full border focus:ring-2 focus:ring-blue-400"
+              />
+              <button
+                type="submit"
+                className="p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <FaPaperPlane />
+              </button>
+            </form>
           </div>
         </div>
       )}
-      {/* Animation style */}
+
       <style jsx>{`
         .animate-fade-in {
           animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .chat-theme-dark {
+          background: #181a20;
+          color: #fff;
+        }
+        .chat-theme-light {
+          background: #fff;
+          color: #222;
         }
       `}</style>
     </>
