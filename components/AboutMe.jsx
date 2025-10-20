@@ -34,7 +34,9 @@ export default function AboutMe() {
             <Image
               src={marufPhoto}
               alt="Maruf"
-              fill
+              width={384}
+              height={384}
+              sizes="(max-width: 640px) 180px, (max-width: 768px) 240px, 384px"
               priority
               className="object-cover group-hover:scale-105 transition-transform duration-700"
             />

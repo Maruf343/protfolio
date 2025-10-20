@@ -10,16 +10,20 @@ export default function DarkModeToggle() {
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.classList.toggle("dark", savedTheme === "dark");
+      document.documentElement.classList.toggle("light", savedTheme === "light");
     } else {
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setTheme(prefersDark ? "dark" : "light");
+      const initial = prefersDark ? "dark" : "light";
+      setTheme(initial);
       document.documentElement.classList.toggle("dark", prefersDark);
+      document.documentElement.classList.toggle("light", !prefersDark);
     }
   }, []);
 
   // Update theme and persist
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("light", theme === "light");
     localStorage.setItem("theme", theme);
   }, [theme]);
 

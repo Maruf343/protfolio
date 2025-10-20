@@ -8,3 +8,35 @@
 html {
   scroll-behavior: smooth;
 }
+
+:root {
+  --bg-light: #ffffff;
+  --text-light: #111827; /* gray-900 */
+}
+
+html, body {
+  background-color: var(--bg-light);
+  color: var(--text-light);
+}
+
+.dark html, .dark body {
+  background-color: #0f172a; /* gray-900 */
+  color: #ffffff;
+}
+
+/* Smooth color transitions when toggling theme */
+body {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Force-light utility: components can add .force-light to always use light palette when .light is present */
+.force-light {
+  background-color: var(--bg-light) !important;
+  color: var(--text-light) !important;
+}
+
+/* Also allow explicit .light class on html to drive theme (used by DarkModeToggle) */
+.light html, .light body {
+  background-color: var(--bg-light);
+  color: var(--text-light);
+}

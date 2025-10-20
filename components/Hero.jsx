@@ -59,12 +59,15 @@ export default function Hero() {
 
       {/* Right Content - Image */}
       <div className="flex-1 mt-10 md:mt-0 flex justify-center md:justify-end relative z-10">
-        <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-full overflow-hidden shadow-xl hover:scale-105 transition-transform duration-500">
+          <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-full overflow-hidden shadow-xl hover:scale-105 transition-transform duration-500">
           <Image
             src={marufPhoto}
             alt="Mohammad Abdullah Al Maruf"
             className="object-cover"
-            fill
+            width={384}
+            height={384}
+            sizes="(max-width: 640px) 180px, (max-width: 768px) 200px, 384px"
+            priority
           />
         </div>
       </div>
