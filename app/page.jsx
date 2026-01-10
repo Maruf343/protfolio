@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
+import InteractiveDashboard from "@/components/InteractiveDashboard";
 import Skills from "@/components/Skills";
 import TechNews from "@/components/TechNews";
 import Contact from "@/components/Contact";
@@ -18,7 +19,7 @@ export default function Home() {
         <Projects />
         <AboutMe />
         <Skills />
-        <TechNews />
+        <TechNews limit={6} />
         <Contact />
       </div>
       <Footer />

@@ -14,11 +14,7 @@ const projects = [
     liveLink: "https://yourportfolio.com",
   },
   {
-    title: "Chat App",
-    description:
-      "Messenger-style live chat with Firebase backend. Real-time messaging and notifications.",
-    image: "/projects/chatapp.png",
-    liveLink: "https://yourchatapp.com",
+    // Chat project removed
   },
   {
     title: "Gardening Community Hub",
@@ -143,7 +139,9 @@ export default function Projects() {
 
       {/* Projects Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10">
-        {projects.map((project, index) => (
+            {projects
+              .filter((project) => project && (project.image || project.title))
+              .map((project, index) => (
           <motion.div
             key={index}
             whileHover={{ y: -8, scale: 1.03 }}
@@ -154,17 +152,25 @@ export default function Projects() {
             className="project-card relative group rounded-2xl overflow-hidden shadow-2xl bg-white/70 dark:bg-gray-800/30 backdrop-blur-xl border border-gray-200/30 dark:border-gray-700/40 hover:shadow-indigo-500/30 transition-all duration-500"
           >
             {/* Image */}
-            <div className="relative w-full h-56 overflow-hidden">
-              <Image
-                src={project.image}
-                alt={project.title}
-                width={1200}
-                height={560}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition duration-500"></div>
-            </div>
+              <div className="relative w-full h-56 overflow-hidden">
+                {project.image ? (
+                  <>
+                    <Image
+                      src={project.image}
+                      alt={project.title || 'Project image'}
+                      width={1200}
+                      height={560}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition duration-500"></div>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-200 to-indigo-400 dark:from-slate-700 dark:to-slate-800">
+                    <div className="text-white font-bold text-lg">{project.title || 'Project'}</div>
+                  </div>
+                )}
+              </div>
 
             {/* Content */}
             <div className="p-6 flex flex-col justify-between">

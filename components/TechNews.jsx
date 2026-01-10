@@ -4,18 +4,33 @@
     import { motion } from "framer-motion";
 
     export default function TechNews() {
-    const [articles, setArticles] = useState([]);
-    const [loading, setLoading] = useState(true);
+        const [articles, setArticles] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
 
     const fetchNews = async () => {
+        setLoading(true);
+        setError(null);
         try {
         const res = await fetch("/api/tech-news");
         const data = await res.json();
-        setArticles(data);
+
+        // The API should return an array of articles. If it returns an object
+        // (for example { error: '...' }) guard against that to avoid .map errors.
+        if (!Array.isArray(data)) {
+            console.error("Unexpected tech-news response:", data);
+            setArticles([]);
+            setError(data?.error || "Failed to load news.");
+        } else {
+            setArticles(data);
+        }
         } catch (err) {
         console.error(err);
-        }
+        setArticles([]);
+        setError("Failed to fetch news.");
+        } finally {
         setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -25,6 +40,21 @@
         const interval = setInterval(fetchNews, 300000);
         return () => clearInterval(interval);
     }, []);
+
+    const sampleArticles = [
+        {
+            title: 'Sample: New JS Framework Released',
+            description: 'A lightweight JS framework was released today offering fast hydration and tiny bundles.',
+            url: '#',
+            urlToImage: '/placeholder.png',
+        },
+        {
+            title: 'Sample: TypeScript 5.x Improvements',
+            description: 'TypeScript introduces ergonomics improvements and faster builds in the latest release.',
+            url: '#',
+            urlToImage: '/placeholder.png',
+        },
+    ];
 
     return (
         <section
@@ -37,6 +67,16 @@
 
         {loading ? (
             <p className="text-center text-gray-700 dark:text-gray-300">Loading news...</p>
+        ) : error ? (
+            <div className="text-center">
+                <p className="text-red-600 dark:text-red-400 mb-3">{error}</p>
+                <div className="flex items-center justify-center gap-3">
+                    <button onClick={fetchNews} className="px-4 py-2 bg-indigo-600 text-white rounded">Retry</button>
+                    <button onClick={() => setArticles(sampleArticles)} className="px-4 py-2 bg-gray-200 rounded">Show sample news</button>
+                </div>
+            </div>
+        ) : articles.length === 0 ? (
+            <p className="text-center text-gray-700 dark:text-gray-300">No news available.</p>
         ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article, index) => (

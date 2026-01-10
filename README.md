@@ -35,32 +35,4 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Messenger-style Live Chat (Firebase)
 
-This project includes a Messenger-style live chat built with React (Next.js), Firebase Firestore, and Firebase Storage. To run the chat locally:
-
-1. Create a Firebase project at https://console.firebase.google.com and enable:
-	- Authentication -> Google Sign-In
-	- Firestore (in test mode for local dev)
-	- Storage
-
-2. Copy `.env.example` to `.env.local` and fill in your Firebase config values from the project settings.
-
-3. Run the dev server:
-
-```powershell
-npm install
-npm run dev
-```
-
-4. Open the app and navigate to the component `LiveChat` (it is exported from `components/LiveChat.jsx`).
-
-Firestore structure used by the chat (example):
-
-- groups/{groupId}/messages/{messageId}
-
-Each message document contains fields: `text`, `senderId`, `senderName`, `senderAvatar`, `timestamp`, `seen`, `delivered`, `type` (text/image/gif), `fileUrl` (for images).
-
-Notes:
-- For GIF integration you'll need an API key (optional).
-- The project already includes `firebase`, `framer-motion`, `react-rnd`, `emoji-picker-react` in `package.json`. If you add other deps, run `npm install`.

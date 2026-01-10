@@ -8,6 +8,7 @@ export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,13 +28,26 @@ export default function Contact() {
 
       if (res.ok) {
         setStatus("success");
+        setStatusMessage('');
         setFormData({ name: "", email: "", message: "" });
       } else {
+        // try to read server error message
+        let msg = 'Something went wrong. Please try again!';
+        try {
+          const json = await res.json();
+          if (json?.error) msg = json.error;
+          else if (json?.message) msg = json.message;
+        } catch (e) {
+          const text = await res.text().catch(() => null);
+          if (text) msg = text;
+        }
         setStatus("error");
+        setStatusMessage(msg);
       }
     } catch (err) {
       console.error(err);
       setStatus("error");
+      setStatusMessage('Network error. Please check your connection.');
     }
 
     setLoading(false);
@@ -140,7 +154,7 @@ export default function Contact() {
                 exit={{ opacity: 0, y: -10 }}
                 className="mt-4 text-red-600 text-center font-medium"
               >
-                Something went wrong. Please try again!
+                {statusMessage || 'Something went wrong. Please try again!'}
               </motion.p>
             )}
           </AnimatePresence>

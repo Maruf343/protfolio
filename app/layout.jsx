@@ -1,6 +1,5 @@
 import React from "react";
 import "./globals.css";
-import LiveChat from "@/components/LiveChat";
 
 export const metadata = {
   title: 'Mohammad Abdullah Al Maruf — Frontend Developer',
@@ -22,10 +21,8 @@ export default function RootLayout({ children }) {
         <link rel="canonical" href="https://yourdomain.com" />
       </head>
   <body className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white font-sans transition-colors duration-300">
-        {children}
-        {/* LiveChat globally visible */}
-        <LiveChat />
-      </body>
+    {children}
+  </body>
     </html>
   );
 }
