@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import marufPhoto from "../public/maruf.png"; // আপনার ছবি public ফোল্ডারে আছে
+import marufPhoto from "../public/maruf.png"; // Make sure your image is in public folder
 import { useState, useEffect } from "react";
 
 export default function Hero() {
@@ -15,7 +15,7 @@ export default function Hero() {
       const timeout = setTimeout(() => {
         setDisplayedName(displayedName + fullName[index]);
         setIndex(index + 1);
-      }, 150);
+      }, 120);
       return () => clearTimeout(timeout);
     }
   }, [index, displayedName]);
@@ -23,7 +23,7 @@ export default function Hero() {
   // Resume download
   const downloadResume = () => {
     const link = document.createElement("a");
-    link.href = "/Mohammad_abdullah_al_maruf.pdf"; // ✅ শুধু public ফোল্ডারের path
+    link.href = "/Mohammad_abdullah_al_maruf.pdf"; // PDF should be in public folder
     link.download = "Mohammad_Abdullah_Al_Maruf_Resume.pdf";
     document.body.appendChild(link);
     link.click();
@@ -33,33 +33,42 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="w-full h-screen flex flex-col md:flex-row justify-center items-center text-center md:text-left bg-gradient-to-br from-indigo-100 via-white to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500 px-6 md:px-32 overflow-hidden"
+      className="w-full min-h-screen flex flex-col md:flex-row justify-center items-center px-6 md:px-32 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500 overflow-hidden"
     >
       {/* Left Content */}
       <div className="flex-1 flex flex-col justify-center items-center md:items-start z-10">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white drop-shadow-md">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight drop-shadow-md">
           {displayedName}
           <span className="blinking-cursor">|</span>
         </h1>
 
-        <p className="mt-4 text-md sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-lg">
-          A MERN Stack Developer building modern, responsive, and high-performance web applications with{" "}
-          <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-            MongoDB, Express, React, Node.js
-          </span>.
+        <p className="mt-6 text-md sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-lg leading-relaxed">
+          I am a <span className="font-semibold text-indigo-600 dark:text-indigo-400">MERN Stack Developer</span> 
+          passionate about building modern, responsive, and high-performance web applications with 
+          <span className="font-semibold text-indigo-600 dark:text-indigo-400"> MongoDB, Express, React, and Node.js</span>.
+          I love crafting clean and user-friendly interfaces that provide an engaging user experience.
         </p>
 
-        <button
-          onClick={downloadResume}
-          className="mt-8 px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-500 hover:scale-105 transition transform duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-600"
-        >
-          Resume
-        </button>
+        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={downloadResume}
+            className="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-500 hover:scale-105 transition transform duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-600"
+          >
+            Download Resume
+          </button>
+
+          <a
+            href="#about"
+            className="px-8 py-3 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 dark:text-indigo-400 transition duration-300 text-center"
+          >
+            About Me
+          </a>
+        </div>
       </div>
 
       {/* Right Content - Image */}
       <div className="flex-1 mt-10 md:mt-0 flex justify-center md:justify-end relative z-10">
-          <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 rounded-full overflow-hidden shadow-xl hover:scale-105 transition-transform duration-500">
+        <div className="relative rounded-full w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 overflow-hidden shadow-2xl hover:scale-105 transition-transform duration-500">
           <Image
             src={marufPhoto}
             alt="Mohammad Abdullah Al Maruf"
@@ -72,7 +81,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* CSS for blinking cursor */}
+      {/* Blinking cursor style */}
       <style jsx>{`
         .blinking-cursor {
           font-weight: bold;
@@ -89,4 +98,4 @@ export default function Hero() {
       `}</style>
     </section>
   );
-}
+}  

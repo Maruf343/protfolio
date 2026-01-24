@@ -14,9 +14,6 @@ const projects = [
     liveLink: "https://yourportfolio.com",
   },
   {
-    // Chat project removed
-  },
-  {
     title: "Gardening Community Hub",
     description:
       "Full-stack gardening community project with user authentication, tips sharing, and dark/light mode.",
@@ -61,7 +58,7 @@ export default function Projects() {
       y: Math.random() * window.innerHeight,
       size: Math.random() * 4 + 2,
       speed: Math.random() * 0.5 + 0.1,
-      opacity: Math.random() * 0.3 + 0.1,
+      opacity: Math.random() * 0.2 + 0.05,
     }));
     setParticles(tempParticles);
 
@@ -81,7 +78,9 @@ export default function Projects() {
     <section
       id="projects"
       ref={containerRef}
-      className="relative min-h-screen px-6 md:px-20 py-16 bg-gradient-to-br from-white to-indigo-50 dark:from-gray-900 dark:to-gray-800 overflow-hidden"
+      className="relative min-h-screen px-6 md:px-20 py-16 
+                 bg-gradient-to-br from-slate-50 via-white to-indigo-50 
+                 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 overflow-hidden"
     >
       {/* Floating particles */}
       <svg className="absolute inset-0 w-full h-full -z-20">
@@ -91,7 +90,7 @@ export default function Projects() {
             cx={p.x}
             cy={p.y}
             r={p.size}
-            fill="rgba(99, 102, 241, 0.2)"
+            fill="rgba(99, 102, 241, 0.15)"
             fillOpacity={p.opacity}
           />
         ))}
@@ -109,9 +108,9 @@ export default function Projects() {
                   y1={cardA.y}
                   x2={cardB.x}
                   y2={cardB.y}
-                  stroke="rgba(99, 102, 241, 0.2)"
+                  stroke="rgba(99, 102, 241, 0.1)"
                   strokeWidth="1"
-                  animate={{ opacity: [0.1, 0.3, 0.1] }}
+                  animate={{ opacity: [0.05, 0.2, 0.05] }}
                   transition={{
                     duration: 2,
                     repeat: Infinity,
@@ -132,16 +131,14 @@ export default function Projects() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
         viewport={{ once: true }}
-        className="text-4xl md:text-5xl font-extrabold text-center  mb-16 relative z-10"
+        className="text-4xl md:text-5xl font-extrabold text-center mb-16 relative z-10 text-gray-900 dark:text-white"
       >
         My Projects
       </motion.h2>
 
       {/* Projects Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10">
-            {projects
-              .filter((project) => project && (project.image || project.title))
-              .map((project, index) => (
+        {projects.map((project, index) => (
           <motion.div
             key={index}
             whileHover={{ y: -8, scale: 1.03 }}
@@ -149,28 +146,31 @@ export default function Projects() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
-            className="project-card relative group rounded-2xl overflow-hidden shadow-2xl bg-white/70 dark:bg-gray-800/30 backdrop-blur-xl border border-gray-200/30 dark:border-gray-700/40 hover:shadow-indigo-500/30 transition-all duration-500"
+            className="project-card relative group rounded-2xl overflow-hidden shadow-2xl 
+                       bg-white/20 dark:bg-gray-800/20 backdrop-blur-md 
+                       border border-gray-200/20 dark:border-gray-700/30 
+                       hover:shadow-indigo-500/30 transition-all duration-500"
           >
             {/* Image */}
-              <div className="relative w-full h-56 overflow-hidden">
-                {project.image ? (
-                  <>
-                    <Image
-                      src={project.image}
-                      alt={project.title || 'Project image'}
-                      width={1200}
-                      height={560}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition duration-500"></div>
-                  </>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-200 to-indigo-400 dark:from-slate-700 dark:to-slate-800">
-                    <div className="text-white font-bold text-lg">{project.title || 'Project'}</div>
-                  </div>
-                )}
-              </div>
+            <div className="relative w-full h-56 overflow-hidden">
+              {project.image ? (
+                <>
+                  <Image
+                    src={project.image}
+                    alt={project.title || 'Project image'}
+                    width={1200}
+                    height={560}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition duration-500"></div>
+                </>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-200 to-indigo-400 dark:from-slate-700 dark:to-slate-800">
+                  <div className="text-white font-bold text-lg">{project.title || 'Project'}</div>
+                </div>
+              )}
+            </div>
 
             {/* Content */}
             <div className="p-6 flex flex-col justify-between">
@@ -189,7 +189,11 @@ export default function Projects() {
                   target="_blank"
                   rel="noopener noreferrer"
                   whileTap={{ scale: 0.95 }}
-                  className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-medium hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-indigo-500/30"
+                  className="mt-6 inline-flex items-center gap-2 px-6 py-2.5 
+                             bg-gradient-to-r from-indigo-600 to-purple-600 
+                             text-white rounded-full font-medium 
+                             hover:from-indigo-500 hover:to-purple-500 
+                             transition-all duration-300 shadow-lg hover:shadow-indigo-500/30"
                 >
                   View Live <ExternalLink size={18} />
                 </motion.a>
@@ -201,5 +205,3 @@ export default function Projects() {
     </section>
   );
 }
-
-      

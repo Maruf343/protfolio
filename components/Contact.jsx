@@ -31,7 +31,6 @@ export default function Contact() {
         setStatusMessage('');
         setFormData({ name: "", email: "", message: "" });
       } else {
-        // try to read server error message
         let msg = 'Something went wrong. Please try again!';
         try {
           const json = await res.json();
@@ -56,8 +55,23 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="relative min-h-screen px-6 md:px-20 py-16 bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800"
+      className="relative min-h-screen px-6 md:px-20 py-16
+        bg-gradient-to-br from-slate-50 via-white to-indigo-50
+        dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 overflow-hidden"
     >
+      {/* Floating particles */}
+      <svg className="absolute inset-0 w-full h-full -z-20">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <circle
+            key={i}
+            cx={Math.random() * window.innerWidth}
+            cy={Math.random() * window.innerHeight}
+            r={Math.random() * 3 + 1.5}
+            fill="rgba(99,102,241,0.1)"
+          />
+        ))}
+      </svg>
+
       <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-4">
         Contact Me
       </h2>
@@ -70,7 +84,7 @@ export default function Contact() {
         {/* Left - Form */}
         <motion.form
           onSubmit={handleSubmit}
-          className="flex-1 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl space-y-6"
+          className="flex-1 bg-white/20 dark:bg-gray-800/20 backdrop-blur-md p-8 rounded-2xl shadow-xl space-y-6 border border-indigo-300/20 dark:border-indigo-500/20"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -143,7 +157,6 @@ export default function Contact() {
                 className="mt-4 text-green-600 text-center font-medium"
               >
                 Message sent successfully!
-                
               </motion.div>
             )}
             {status === "error" && (
@@ -161,7 +174,7 @@ export default function Contact() {
         </motion.form>
 
         {/* Right - Info / Illustration */}
-        <div className="flex-1 flex flex-col justify-center gap-6 p-6 rounded-2xl bg-indigo-50 dark:bg-gray-800 shadow-xl">
+        <div className="flex-1 flex flex-col justify-center gap-6 p-6 rounded-2xl bg-white/20 dark:bg-gray-800/20 backdrop-blur-md shadow-xl border border-indigo-300/20 dark:border-indigo-500/20">
           <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             Get in Touch
           </h3>
