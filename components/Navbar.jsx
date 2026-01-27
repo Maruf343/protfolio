@@ -52,12 +52,14 @@ export default function Navbar() {
       {/* Glass Blur Navbar with Floating Hover Effect */}
       <nav
         ref={navRef}
-        className="fixed top-0 left-1/2 transform -translate-x-1/2 w-7xl z-50 backdrop-blur-lg bg-white/30 dark:bg-gray-900/30 border-b border-white/20 dark:border-gray-700/20 rounded-b-xl shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-white/30 dark:bg-gray-900/30 border-b border-white/20 dark:border-gray-700/20 shadow-lg transition-transform duration-300"
       >
-        <div className="flex justify-between items-center px-6 py-4">
-          <h1 className="font-bold text-xl text-gray-900 dark:text-white">Maruf</h1>
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+          <h1 className="font-bold text-xl text-gray-900 dark:text-white">
+            Mohammad Abdullah <span className="text-indigo-500">Al Maruf</span>
+          </h1>
 
-          <div className="relative flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-6">
             {sections.map((section) => (
               <a
                 key={section}
@@ -78,6 +80,40 @@ export default function Navbar() {
               </a>
             ))}
             <DarkModeToggle />
+          </div>
+
+          {/* Mobile: simple menu toggle */}
+          <div className="md:hidden flex items-center space-x-3">
+            <DarkModeToggle />
+            <button
+              onClick={() => {
+                const menu = document.getElementById('mobile-nav');
+                if (menu) menu.classList.toggle('hidden');
+              }}
+              className="p-2 rounded-md bg-white/40 dark:bg-gray-800/40"
+              aria-label="Toggle menu"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800 dark:text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile nav items */}
+        <div id="mobile-nav" className="md:hidden hidden px-6 pb-4">
+          <div className="flex flex-col gap-3">
+            {sections.map((section) => (
+              <a
+                key={section}
+                href={`#${section}`}
+                className={`capitalize text-base font-medium transition-colors duration-200 ${
+                  active === section ? 'text-indigo-600' : 'text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                {section.replace('-', ' ')}
+              </a>
+            ))}
           </div>
         </div>
       </nav>

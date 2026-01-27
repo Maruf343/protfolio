@@ -33,17 +33,21 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="w-full min-h-screen flex flex-col md:flex-row justify-center items-center px-6 md:px-32 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500 overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col md:flex-row justify-center items-center px-6 md:px-32 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-500 overflow-hidden"
     >
+      {/* Background Glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-indigo-500/10 blur-[120px]" />
+      </div>
       {/* Left Content */}
       <div className="flex-1 flex flex-col justify-center items-center md:items-start z-10">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight drop-shadow-md">
-          {displayedName}
+          {displayedName.split(' ').slice(0, -1).join(' ')} <span className="text-indigo-500">{displayedName.split(' ').slice(-1)}</span>
           <span className="blinking-cursor">|</span>
         </h1>
 
         <p className="mt-6 text-md sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-lg leading-relaxed">
-          I am a <span className="font-semibold text-indigo-600 dark:text-indigo-400">MERN Stack Developer</span> 
+          I am a <span className="font-semibold text-indigo-600 dark:text-indigo-400">MERN Stack Developer </span> 
           passionate about building modern, responsive, and high-performance web applications with 
           <span className="font-semibold text-indigo-600 dark:text-indigo-400"> MongoDB, Express, React, and Node.js</span>.
           I love crafting clean and user-friendly interfaces that provide an engaging user experience.
