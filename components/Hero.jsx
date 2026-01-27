@@ -33,7 +33,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative w-full min-h-screen flex flex-col md:flex-row justify-center items-center px-6 md:px-32 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-500 overflow-hidden"
+      className="relative w-full min-h-screen flex flex-col md:flex-row justify-center items-center px-6  md:px-32 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-500 overflow-hidden"
     >
       {/* Background Glow */}
       <div className="absolute inset-0 pointer-events-none">
@@ -49,7 +49,7 @@ export default function Hero() {
         <p className="mt-6 text-md sm:text-lg md:text-xl text-gray-700 dark:text-gray-300 max-w-lg leading-relaxed">
           I am a <span className="font-semibold text-indigo-600 dark:text-indigo-400">MERN Stack Developer </span> 
           passionate about building modern, responsive, and high-performance web applications with 
-          <span className="font-semibold text-indigo-600 dark:text-indigo-400"> MongoDB, Express, React, and Node.js</span>.
+          <span className="font-semibold text-indigo-600 dark:text-indigo-400"> MongoDB, Express, React, Next and Node.js</span>.
           I love crafting clean and user-friendly interfaces that provide an engaging user experience.
         </p>
 
