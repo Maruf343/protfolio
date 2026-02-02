@@ -1,6 +1,7 @@
 import React from "react";
 import "./globals.css";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: 'Mohammad Abdullah Al Maruf — Frontend Developer',
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
   <body className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-white font-sans transition-colors duration-300">
     {children}
     <FloatingWhatsApp />
+    <Toaster />
   </body>
     </html>
   );

@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaUser, FaEnvelope, FaComment, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
+import toast from 'react-hot-toast';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("");
-  const [statusMessage, setStatusMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,7 +16,6 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setStatus("");
 
     try {
       const res = await fetch("/api/contact", {
@@ -27,8 +25,7 @@ export default function Contact() {
       });
 
       if (res.ok) {
-        setStatus("success");
-        setStatusMessage('');
+        toast.success('Message sent successfully!');
         setFormData({ name: "", email: "", message: "" });
       } else {
         let msg = 'Something went wrong. Please try again!';
@@ -40,13 +37,11 @@ export default function Contact() {
           const text = await res.text().catch(() => null);
           if (text) msg = text;
         }
-        setStatus("error");
-        setStatusMessage(msg);
+        toast.error(msg);
       }
     } catch (err) {
       console.error(err);
-      setStatus("error");
-      setStatusMessage('Network error. Please check your connection.');
+      toast.error('Network error. Please check your connection.');
     }
 
     setLoading(false);
@@ -146,31 +141,6 @@ export default function Contact() {
           >
             {loading ? "Sending..." : "Send Message"}
           </button>
-
-          <AnimatePresence>
-            {status === "success" && (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-4 text-green-600 text-center font-medium"
-              >
-                Message sent successfully!
-              </motion.div>
-            )}
-            {status === "error" && (
-              <motion.p
-                key="error"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-4 text-red-600 text-center font-medium"
-              >
-                {statusMessage || 'Something went wrong. Please try again!'}
-              </motion.p>
-            )}
-          </AnimatePresence>
         </motion.form>
 
         {/* Right - Info / Illustration */}
